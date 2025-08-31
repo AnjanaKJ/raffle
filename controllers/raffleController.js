@@ -40,7 +40,8 @@ async function createRaffle(req, res) {
       numWinners,
       prizeAmount,
       endTime,
-      numEntries: 0
+      numEntries: 0,
+      revealTxHash: receipt.logs[0]?.transactionHash || receipt.hash
     });
 
     res.json({
