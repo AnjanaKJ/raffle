@@ -4,13 +4,16 @@ const Raffle = require('../models/Raffle');
 const Participant = require('../models/Participant');
 const { v4: uuidv4 } = require('uuid');
 const QRCodeImage = require('qrcode');
+const axios = require("axios");
+const fs = require("fs");
+require("dotenv").config();
 
 async function createRaffle(req, res) {
   try {
     const { numWinners, prizeAmount, endTime, ownerAddress } = req.body;
 
     const currentTime = Math.floor(Date.now() / 1000); 
-    const shortEndTime = currentTime + 120;
+    const shortEndTime = currentTime + 240;
     const receipt = await raffleService.createRaffle(numWinners, prizeAmount, shortEndTime);
 
     let raffleId;
@@ -144,7 +147,7 @@ async function getParticipants(req, res) {
 
 async function getWinners(req, res) {
     try {
-        const { id } = req.params;
+        const { id } = req. params;
         const winners = await raffleService.getWinners(id);
         res.json({ winners });
     } catch (err) {
@@ -210,6 +213,91 @@ async function generateQRCodes(req, res) {
     }
 }
 
+async function deployNFTWithImage(req, res) {
+    try {
+        const { raffleId, name, symbol } = req.body;
+        if (!raffleId) return res.status(400).json({ error: "Missing raffleId" });
+
+        if (!req.file) return res.status(400).json({ error: "Image file is required" });
+
+        const filePath = req.file.path;
+        const fileName = req.file.originalname;
+
+        // Upload to Pinata
+        const ipfsURL = await uploadToPinata(filePath, fileName);
+
+        // Use image URL as baseURI for NFT
+        const tx = await raffleService.deployNFTForRaffle(raffleId, name, symbol, ipfsURL);
+
+        res.json({
+            message: "NFT deployed successfully",
+            txHash: tx.hash,
+            ipfsURL
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+const PINATA_API_KEY = process.env.PINATA_API_KEY;
+const PINATA_SECRET_API_KEY = process.env.PINATA_SECRET_API_KEY;
+
+async function uploadToPinata(filePath, fileName) {
+    const url = "https://api.pinata.cloud/pinning/pinFileToIPFS";
+
+    const FormData = require("form-data");
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(filePath));
+
+    // Optional metadata
+    const metadata = JSON.stringify({
+        name: fileName,
+        keyvalues: {
+            app: "raffle-system",
+            timestamp: new Date().toISOString()
+        }
+    });
+    formData.append("pinataMetadata", metadata);
+
+    // Optional options
+    const pinataOptions = JSON.stringify({
+        cidVersion: 0,
+        wrapWithDirectory: false
+    });
+    formData.append("pinataOptions", pinataOptions);
+
+    const response = await axios.post(url, formData, {
+        maxBodyLength: "Infinity", // Required for large files
+        headers: {
+            "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
+            pinata_api_key: PINATA_API_KEY,
+            pinata_secret_api_key: PINATA_SECRET_API_KEY
+        },
+        timeout: 30000 // 30s
+    });
+
+    // Returns IPFS hash and URL
+    return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
+}
+
+async function mintNFTToLosers(req, res) {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ error: "Missing raffleId" });
+        }
+
+        const tx = await raffleService.mintNFTToLosers(id);
+        res.json({
+            message: "NFT minted to losers successfully",
+            txHash: tx.hash
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
 
 module.exports = {
     createRaffle,
@@ -217,5 +305,7 @@ module.exports = {
     revealWinners,
     getParticipants,
     getWinners,
-    generateQRCodes
+    generateQRCodes,
+    deployNFTWithImage,
+    mintNFTToLosers
 };

@@ -1,5 +1,43 @@
 [
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_numWinners",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_prizeAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_endTime",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_nftName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_nftSymbol",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_baseURI",
+				"type": "string"
+			}
+		],
+		"name": "createRaffle",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -19,36 +57,17 @@
 		"type": "event"
 	},
 	{
-		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "raffleId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "nftAddress",
-				"type": "address"
-			}
-		],
-		"name": "NFTDeployed",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
 				"internalType": "uint256",
 				"name": "raffleId",
 				"type": "uint256"
 			}
 		],
-		"name": "NFTMintedToLosers",
-		"type": "event"
+		"name": "enterRaffle",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -82,10 +101,29 @@
 				"internalType": "uint256",
 				"name": "endTime",
 				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "nftContract",
+				"type": "address"
 			}
 		],
 		"name": "RaffleCreated",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "raffleId",
+				"type": "uint256"
+			}
+		],
+		"name": "revealWinners",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -110,70 +148,6 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_numWinners",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_prizeAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_endTime",
-				"type": "uint256"
-			}
-		],
-		"name": "createRaffle",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "raffleId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "symbol",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "baseURI",
-				"type": "string"
-			}
-		],
-		"name": "deployNFTForRaffle",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "raffleId",
-				"type": "uint256"
-			}
-		],
-		"name": "enterRaffle",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
 				"name": "raffleId",
 				"type": "uint256"
 			}
@@ -184,19 +158,6 @@
 				"internalType": "address[]",
 				"name": "",
 				"type": "address[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getRaffleCount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -219,19 +180,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "raffleId",
-				"type": "uint256"
-			}
-		],
-		"name": "mintNFTToLosers",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -294,19 +242,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "raffleId",
-				"type": "uint256"
-			}
-		],
-		"name": "revealWinners",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

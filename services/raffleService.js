@@ -33,11 +33,24 @@ async function getWinners(raffleId) {
   return await contract.getWinners(raffleId);
 }
 
+async function deployNFTForRaffle(raffleId, name, symbol, baseURI) {
+    // signer must be the raffle owner
+    const tx = await contract.deployNFTForRaffle(raffleId, name, symbol, baseURI);
+    return await tx.wait();
+}
+
+async function mintNFTToLosers(raffleId) {
+    const tx = await contract.mintNFTToLosers(raffleId);
+    return await tx.wait();
+}
+
 module.exports = {
   createRaffle,
   enterRaffle,
   revealWinners,
   getParticipants,
   getWinners,
-  contract
+  contract,
+  deployNFTForRaffle,
+  mintNFTToLosers
 };
